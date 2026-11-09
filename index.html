@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050914">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>POWER STRIKER</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- Shown in portrait: the game is landscape-only -->
+  <div id="rotate">
+    <svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true"><rect x="18" y="8" width="28" height="48" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><path d="M50 22 L60 14 M60 14 L60 24 M60 14 L50 14" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    <h2>أدر جهازك للوضع الأفقي</h2>
+    <p>POWER STRIKER تُلعب بالعرض فقط</p>
+  </div>
+
+  <div id="app">
+    <!-- ───────── Main menu ───────── -->
+    <section id="menu" class="screen">
+      <div class="menu-wrap">
+        <div class="brand">
+          <div class="logo"><span>POWER</span>STRIKER</div>
+          <div class="tag">كرة قدم أرينا · 5 ضد 5</div>
+        </div>
+        <nav class="nav">
+          <button class="nav-btn primary" data-go="lineup"><i>▶</i><span>العب الآن</span></button>
+          <button class="nav-btn" id="btnTraining"><i>◎</i><span>التدريب</span></button>
+          <button class="nav-btn" data-go="online"><i>◆</i><span>أونلاين</span></button>
+          <button class="nav-btn" data-go="chars"><i>★</i><span>الشخصيات</span></button>
+          <button class="nav-btn" data-go="cust"><i>✎</i><span>التخصيص</span></button>
+          <button class="nav-btn" data-go="settings"><i>⚙</i><span>الإعدادات</span></button>
+          <button class="nav-btn" data-go="profile"><i>◉</i><span>الملف الشخصي</span></button>
+        </nav>
+        <div class="profile-card">
+          <div class="avatar" id="avatar">S</div>
+          <div class="pc-info">
+            <b id="pName">ستراكر</b>
+            <small id="pMeta"></small>
+            <div class="xp"><i id="pXp"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Character select ───────── -->
+    <section id="chars" class="screen sub hidden">
+      <header class="bar"><button class="back" data-go="menu">‹ رجوع</button><h2>الشخصيات</h2><span class="bar-end"></span></header>
+      <div class="body"><div id="charList" class="grid"></div></div>
+    </section>
+
+    <!-- ───────── Customization ───────── -->
+    <section id="cust" class="screen sub hidden">
+      <header class="bar"><button class="back" data-go="menu">‹ رجوع</button><h2 id="custTitle">التخصيص</h2><span class="bar-end"></span></header>
+      <div class="body narrow">
+        <div class="group"><h3>تسريحة الشعر</h3><div id="custStyles" class="chips"></div></div>
+        <div class="group"><h3>لون الشعر</h3><div id="custHair" class="swatches"></div></div>
+        <div class="group"><h3>لون البشرة</h3><div id="custSkin" class="swatches"></div></div>
+        <div class="group"><h3>لون الحذاء</h3><div id="custBoots" class="swatches"></div></div>
+        <div class="group row-inline"><h3>رقم القميص</h3><input id="custNumber" type="number" min="1" max="99"></div>
+      </div>
+    </section>
+
+    <!-- ───────── Settings ───────── -->
+    <section id="settings" class="screen sub hidden">
+      <header class="bar"><button class="back" data-go="menu">‹ رجوع</button><h2>الإعدادات</h2><span class="bar-end"></span></header>
+      <div class="body narrow">
+        <div class="group"><h3>المباراة</h3>
+          <div class="field"><label>الصعوبة</label>
+            <select data-set="difficulty"><option value="easy">سهل</option><option value="normal">عادي</option><option value="hard">صعب</option></select></div>
+          <div class="field"><label>مدة المباراة</label>
+            <select data-set="duration" data-num><option value="120">دقيقتان</option><option value="180">3 دقائق</option><option value="240">4 دقائق</option></select></div>
+          <div class="field"><label>لاعبون في كل فريق</label>
+            <select data-set="teamSize" data-num><option value="1">1 ضد 1</option><option value="2">2 ضد 2</option><option value="3">3 ضد 3</option><option value="4">4 ضد 4</option><option value="5">5 ضد 5</option></select></div>
+          <div class="field"><label>هدف ذهبي عند التعادل</label><input type="checkbox" class="toggle" data-set="goldenGoal"></div>
+        </div>
+        <div class="group"><h3>الكاميرا والعرض</h3>
+          <div class="field"><label>الجودة</label>
+            <select data-set="quality"><option value="low">منخفضة</option><option value="medium">متوسطة</option><option value="high">عالية</option></select></div>
+          <div class="field"><label>حساسية الكاميرا</label><input type="range" min="0.4" max="2" step="0.1" data-set="sensitivity" data-num></div>
+          <div class="field"><label>عكس محور الكاميرا</label><input type="checkbox" class="toggle" data-set="invertY"></div>
+        </div>
+        <div class="group"><h3>الصوت</h3>
+          <div class="field"><label>الموسيقى</label><input type="range" min="0" max="1" step="0.05" data-set="music" data-num></div>
+          <div class="field"><label>المؤثرات</label><input type="range" min="0" max="1" step="0.05" data-set="sfx" data-num></div>
+          <div class="field"><label>كتم الصوت</label><input type="checkbox" class="toggle" data-set="muted"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Profile ───────── -->
+    <section id="profile" class="screen sub hidden">
+      <header class="bar"><button class="back" data-go="menu">‹ رجوع</button><h2>الملف الشخصي</h2><span class="bar-end"></span></header>
+      <div class="body narrow">
+        <div class="group"><h3>اسم اللاعب</h3><input id="pname" maxlength="14" class="wide-input"></div>
+        <div id="pstats" class="stats"></div>
+      </div>
+    </section>
+
+    <!-- ───────── Lineup / position select ───────── -->
+    <section id="lineup" class="screen sub hidden">
+      <header class="bar"><button class="back" data-go="menu">‹ رجوع</button><h2>اختر مركزك</h2><span class="bar-end"></span></header>
+      <div class="body">
+        <div id="roleCards" class="role-grid"></div>
+        <p id="roleDesc" class="hint"></p>
+      </div>
+      <footer class="foot"><button class="btn primary" id="kick">ابدأ المباراة</button></footer>
+    </section>
+
+    <!-- ───────── Results ───────── -->
+    <section id="results" class="screen hidden">
+      <div class="result-card">
+        <div id="resTitle" class="res-title"></div>
+        <div id="resBody"></div>
+        <div id="rankLine" class="xp-line"></div>
+        <div class="foot-row">
+          <button class="btn" data-go="menu">القائمة</button>
+          <button class="btn primary" data-go="lineup">مباراة جديدة</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Online (accounts, rank, rooms) — content is rendered by js/online/panel.js -->
+    <section id="online" class="screen sub hidden">
+      <header class="bar"><button class="back" data-go="menu">‹ رجوع</button><h2>أونلاين</h2><span class="bar-end"></span></header>
+      <div class="body narrow" id="onlineBody"></div>
+    </section>
+
+    <!-- Ranked search -->
+    <section id="queue" class="screen hidden">
+      <div class="result-card small">
+        <h2 class="res-title">نبحث عن خصم</h2>
+        <div id="queueTimer" class="queue-timer">60</div>
+        <p class="sub" id="queueMsg"></p>
+        <div class="stack"><button class="btn" id="queueCancel">إلغاء</button></div>
+      </div>
+    </section>
+
+    <!-- Pause -->
+    <section id="pauseMenu" class="screen hidden">
+      <div class="result-card small">
+        <h2 class="res-title">متوقفة مؤقتاً</h2>
+        <div class="stack">
+          <button class="btn primary" id="resume">متابعة</button>
+          <button class="btn" id="quit">إنهاء المباراة</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ───────── In-match HUD ───────── -->
+  <div id="hud" class="hidden">
+    <button id="pause" class="icon-btn" aria-label="إيقاف مؤقت">❚❚</button>
+    <div class="board">
+      <div class="team a"><i></i><span>NOVA</span><b id="sA">0</b></div>
+      <div class="clock-wrap"><div id="clock" class="clock">3:00</div></div>
+      <div class="team b"><b id="sB">0</b><span>FANG</span><i></i></div>
+    </div>
+    <div id="bars">
+      <div class="bar-row"><label>الطاقة</label><div class="track"><div id="energyFill" class="fill energy"></div></div></div>
+      <div class="bar-row"><label>النفس</label><div class="track"><div id="staminaFill" class="fill stamina"></div></div></div>
+    </div>
+    <div id="chargeBox" class="charge hidden"><small>قوة التسديد</small><div class="track"><div id="chargeFill"></div></div></div>
+    <div id="toast" class="toast hidden"></div>
+    <div id="big" class="big-msg hidden"></div>
+  </div>
+
+  <!-- ───────── Touch controls ───────── -->
+  <div id="touch" class="hidden">
+    <div id="joy"><div id="joyKnob"></div></div>
+    <div id="look"></div>
+    <div id="actions">
+      <button class="btn-act sm" data-act="sprint" style="grid-area:sprint"><small>سبرنت</small></button>
+      <button class="btn-act sm" data-act="jump" style="grid-area:jump"><small>قفز</small></button>
+      <button class="btn-act sm" data-act="tackle" style="grid-area:tackle"><small>شد</small></button>
+      <button class="btn-act big" data-act="shoot" style="grid-area:shoot"><b>اضرب</b></button>
+      <button class="btn-act sm" data-act="pass" style="grid-area:pass"><small>مرر</small></button>
+      <button class="btn-act sm" data-act="dribble" style="grid-area:dribble"><small>مراوغة</small></button>
+      <button id="btnSpecial" class="btn-act sm special" data-act="special" style="grid-area:special"><small>✦ خاصة</small></button>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
